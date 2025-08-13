@@ -1,5 +1,3 @@
-
-
 import Front from "../assets/Front.svg";
 import X2 from "../assets/x2.svg";
 import Stop from "../assets/stop.svg";
@@ -10,7 +8,7 @@ import Component1000 from "../assets/Component1000.svg";
 import Cash100 from "../assets/Cash100.svg";
 import Cash10 from "../assets/Cash10.svg";
 import Bomb from "../assets/Bomb.svg";
-// новые иконки для счетчиков
+// new icons for counters
 import CashIcon from "../assets/cash.1.svg";
 import X2Icon from "../assets/x2.1.svg";
 import ZeroIcon from "../assets/zero.1.svg";
@@ -43,18 +41,18 @@ const imageData = [
 
     function handleClick(idx: number) {
       if (opened[idx] || gameOver) return;
-      // Найти неиспользованные картинки
+      // Find unused images
       const used = assigned.filter(Boolean).map((img) => img?.src);
       const available = imageData.filter((img) => !used.includes(img.src));
       if (available.length === 0) return;
-      // Выбрать случайную
+      // Pick a random one
       const random = available[Math.floor(Math.random() * available.length)];
       const newAssigned = [...assigned];
       newAssigned[idx] = random;
       const newOpened = [...opened];
       newOpened[idx] = true;
 
-      // Логика подсчета
+      // Counting logic
       if (random.type === "money") {
         setMoney((prev) => prev + random.value);
       } else if (random.type === "x2") {
@@ -69,7 +67,7 @@ const imageData = [
       setOpened(newOpened);
     }
 
-    // Сброс игры (по желанию, можно добавить кнопку)
+    // Reset game (optional, you can add a button)
     // function resetGame() {
     //   setOpened(Array(9).fill(false));
     //   setAssigned(Array(9).fill(null));
@@ -78,7 +76,7 @@ const imageData = [
     //   setGameOver(false);
     // }
 
-    // Подсчет оставшихся по типам
+    // Count remaining cards by type
     const left = {
       money: 0,
       x2: 0,
@@ -132,10 +130,10 @@ const imageData = [
         </div>
         {gameOver && (
           <div className="mt-6 text-center">
-            <span className="text-lg font-bold text-red-500">Игра окончена</span>
+            <span className="text-lg font-bold text-red-500">Game Over</span>
           </div>
         )}
-        {/* Счетчики оставшихся карточек по типам */}
+        {/* Counters for remaining cards by type */}
         <div className="flex justify-center gap-6 mt-8">
           <div className="flex items-center gap-1">
             <img src={CashIcon} alt="money" className="w-7 h-7" />
@@ -159,5 +157,7 @@ const imageData = [
           </div>
         </div>
       </main>
+    );
+  }
     );
   }
