@@ -15,7 +15,7 @@ import ZeroIcon from "../assets/zero.1.svg";
 import BombIcon from "../assets/bomb.svg";
 import StopIcon from "../assets/stop.1.svg";
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 
 
 const imageData = [
@@ -39,6 +39,10 @@ const imageData = [
     const [multiplier, setMultiplier] = useState(1);
     const [gameOver, setGameOver] = useState(false);
 
+    // Animation state
+    const [animating, setAnimating] = useState<{ idx: number; value: number } | null>(null);
+    const gridRef = useRef<HTMLDivElement>(null);
+
     function handleClick(idx: number) {
       if (opened[idx] || gameOver) return;
       // Find unused images
@@ -54,7 +58,11 @@ const imageData = [
 
       // Counting logic
       if (random.type === "money") {
-        setMoney((prev) => prev + random.value);
+        setAnimating({ idx, value: random.value }); // trigger animation
+        setTimeout(() => {
+          setMoney((prev) => prev + random.value);
+          setAnimating(null);
+        }, 700); // animation duration
       } else if (random.type === "x2") {
         setMoney((prev) => prev * 2);
       } else if (random.type === "zero") {
@@ -107,13 +115,76 @@ const imageData = [
       }
     });
 
+    // Animation component
+    function MoneyFlyAnimation({ idx, value }: { idx: number; value: number }) {
+      // Calculate card position in grid
+      const row = Math.floor(idx / 3);
+      const col = idx % 3;
+      // Start position: card center
+      // End position: money counter (top left)
+      return (
+        <div
+          style={{
+            position: "absolute",
+            left: `calc(${col} * 8rem + 1.5rem)`,
+            top: `calc(${row} * 8rem + 7rem)`,
+            pointerEvents: "none",
+            zIndex: 50,
+          }}
+        >
+          <div
+            style={{
+              animation: "fly-money 0.7s cubic-bezier(.7,-0.2,.7,1.2) forwards",
+              display: "flex",
+              alignItems: "center",
+              gap: "0.5rem",
+            }}
+          >
+            <img src={Front1m} alt="money" style={{ width: 56, height: 56 }} />
+            <span style={{
+              fontSize: "2rem",
+              fontWeight: "bold",
+              color: "#BFFF7A",
+              textShadow: "0 0 8px #BFFF7A"
+            }}>
+              {value >= 1_000_000 ? `${value / 1_000_000}M` : value.toLocaleString()}
+            </span>
+          </div>
+        </div>
+      );
+    }
+
+    // Animation keyframes
+    const animationStyles = `
+      @keyframes fly-money {
+        0% {
+          transform: translate(0,0) scale(1);
+          opacity: 1;
+          filter: drop-shadow(0 0 0 #BFFF7A);
+        }
+        70% {
+          opacity: 1;
+          filter: drop-shadow(0 0 16px #BFFF7A);
+        }
+        100% {
+          transform: translate(0, -10rem) scale(0.7);
+          opacity: 0.2;
+          filter: drop-shadow(0 0 0 #BFFF7A);
+        }
+      }
+    `;
+
     return (
-      <main className="flex flex-col items-center justify-center min-h-screen bg-transparent">
-        <div className="flex items-center gap-2 mb-4">
+      <main className="flex flex-col items-center justify-center min-h-screen bg-transparent" style={{ position: "relative" }}>
+        <div className="flex items-center gap-2 mb-4" style={{ position: "relative", zIndex: 10 }}>
           <img src={CashIcon} alt="money" className="w-6 h-6" />
           <span className="text-2xl font-bold text-white drop-shadow">{money.toLocaleString()}</span>
         </div>
-        <div className="grid grid-cols-3 grid-rows-3 gap-6">
+        <div
+          className="grid grid-cols-3 grid-rows-3 gap-6"
+          ref={gridRef}
+          style={{ position: "relative" }}
+        >
           {Array.from({ length: 9 }).map((_, i) => (
             <img
               key={i}
@@ -127,6 +198,8 @@ const imageData = [
               style={{ opacity: opened[i] ? 1 : 0.6 }}
             />
           ))}
+          {/* Animation overlay */}
+          {animating && <MoneyFlyAnimation idx={animating.idx} value={animating.value} />}
         </div>
         {gameOver && (
           <div className="mt-6 text-center">
@@ -156,6 +229,10 @@ const imageData = [
             <span className="text-red-400 font-bold text-lg">{left.stop}</span>
           </div>
         </div>
+        {/* Animation keyframes */}
+        <style>
+          {animationStyles}
+        </style>
       </main>
     );
   }
