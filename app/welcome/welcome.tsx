@@ -10,6 +10,12 @@ import Component1000 from "../assets/Component1000.svg";
 import Cash100 from "../assets/Cash100.svg";
 import Cash10 from "../assets/Cash10.svg";
 import Bomb from "../assets/Bomb.svg";
+// новые иконки для счетчиков
+import CashIcon from "../assets/cash.1.svg";
+import X2Icon from "../assets/x2.1.svg";
+import ZeroIcon from "../assets/zero.1.svg";
+import BombIcon from "../assets/bomb.svg";
+import StopIcon from "../assets/stop.1.svg";
 
 import React, { useState } from "react";
 
@@ -72,11 +78,41 @@ const imageData = [
     //   setGameOver(false);
     // }
 
+    // Подсчет оставшихся по типам
+    const left = {
+      money: 0,
+      x2: 0,
+      zero: 0,
+      bomb: 0,
+      stop: 0,
+    };
+    imageData.forEach((img) => {
+      const openedIdx = assigned.findIndex((a) => a && a.src === img.src);
+      if (openedIdx === -1) {
+        switch (img.type) {
+          case "money":
+            left.money++;
+            break;
+          case "x2":
+            left.x2++;
+            break;
+          case "zero":
+            left.zero++;
+            break;
+          case "bomb":
+            left.bomb++;
+            break;
+          case "stop":
+            left.stop++;
+            break;
+        }
+      }
+    });
+
     return (
       <main className="flex flex-col items-center justify-center min-h-screen bg-transparent">
         <div className="flex items-center gap-2 mb-4">
-          {/* x2 больше не нужен, но если хотите показывать сколько раз был x2, можно добавить отдельный счетчик */}
-          <img src={Cash100} alt="money" className="w-6 h-6" />
+          <img src={CashIcon} alt="money" className="w-6 h-6" />
           <span className="text-2xl font-bold text-white drop-shadow">{money.toLocaleString()}</span>
         </div>
         <div className="grid grid-cols-3 grid-rows-3 gap-6">
@@ -99,6 +135,29 @@ const imageData = [
             <span className="text-lg font-bold text-red-500">Игра окончена</span>
           </div>
         )}
+        {/* Счетчики оставшихся карточек по типам */}
+        <div className="flex justify-center gap-6 mt-8">
+          <div className="flex items-center gap-1">
+            <img src={CashIcon} alt="money" className="w-7 h-7" />
+            <span className="text-white font-bold text-lg">{left.money}</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <img src={X2Icon} alt="x2" className="w-7 h-7" />
+            <span className="text-blue-400 font-bold text-lg">{left.x2}</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <img src={ZeroIcon} alt="zero" className="w-7 h-7" />
+            <span className="text-yellow-400 font-bold text-lg">{left.zero}</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <img src={BombIcon} alt="bomb" className="w-7 h-7" />
+            <span className="text-red-400 font-bold text-lg">{left.bomb}</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <img src={StopIcon} alt="stop" className="w-7 h-7" />
+            <span className="text-red-400 font-bold text-lg">{left.stop}</span>
+          </div>
+        </div>
       </main>
     );
   }
